@@ -1,89 +1,93 @@
 package up.mi.paa.reseau_electrique.view;
-import java.util.*;
 
+import java.util.Scanner;
 import up.mi.paa.reseau_electrique.controller.Controller;
-import up.mi.paa.reseau_electrique.model.*;
+import up.mi.paa.reseau_electrique.model.Reseau;
+
 public class View {
-public static void lancerProg() {
-	int chois = 1;
-	Reseau r = new Reseau();
-	Scanner sc = new Scanner(System.in);
-	Scanner scs = new Scanner(System.in);
-	do {
-		System.out.println("taper 1 pour ajouter une maison format(nom type)");
-		System.out.println("taper 2 pour ajouter un generateur format(nom capacité)");
-		System.out.println("taper 3 pour ajouter une connexion format(nomGenerateur nomMaison)");
-		System.out.println("taper 0 pour quitter");
-		chois = sc.nextInt();
-		switch (chois) {
-		case 1:
-			String nouvM = "omar";
-			do {
-				System.out.println("donner votre maison");
-				nouvM = scs.nextLine();
-				if(Controller.formatAjoutMaison(nouvM)) {
-					 String[] parties = nouvM.trim().split("\\s+");
-					 r.ajouterMaison(new Maison(parties[0],TypeMaison.stringToTypeMaison(parties[1])));
-				}else {
-					System.out.println("mauvais format M");
-				}
-			}while(!Controller.formatAjoutMaison(nouvM));
-			break;
-		case 2:
-			String nouvG;
-			do {
-				nouvG = scs.nextLine();
-				if(Controller.formatAjoutGenerateur(nouvG)) {
-					 String[] parties = nouvG.trim().split("\\s+");
-					 r.ajouterGenerateur(new Generateur(parties[0], Integer.parseInt(parties[1])));
-				}else {
-					System.out.println("mauvais format G");
-				}
-			}while(!Controller.formatAjoutGenerateur(nouvG));
-			break;
-		case 3:
-		    String nouvC;
-		    String[] parties = null;
 
-		    do {
-		        System.out.println("Donner la connexion (format: nomGenerateur nomMaison)");
-		        nouvC = scs.nextLine().trim();
+    public static void lancerProg() {
+        Scanner sc = new Scanner(System.in);
+        Scanner scs = new Scanner(System.in);
 
-		        
-		        if (!Controller.formatAjoutConnexion(nouvC)) {
-		            System.out.println("Mauvais format C");
-		            continue; 
-		        }
+        Reseau reseau = new Reseau();
+        Controller controller = new Controller(reseau);
 
-		        
-		        parties = nouvC.split("\\s+");
+        int choix;
 
-		       
-		        Generateur g = r.recupererGenerateur(parties[0]);
-		        Maison m = r.recupererMaison(parties[1]);
+        do {
+            System.out.println("\n=== MENU RÉSEAU ÉLECTRIQUE ===");
+            System.out.println("1 - Ajouter une maison (format: nom type)");
+            System.out.println("2 - Ajouter un générateur (format: nom capacité)");
+            System.out.println("3 - Ajouter une connexion (format: nomGenerateur nomMaison)");
+            System.out.println("0 - Quitter");
+            System.out.print("Votre choix : ");
+            choix = sc.nextInt();
+            sc.nextLine(); 
 
-		        if (g == null || m == null) {
-		            System.out.println("La maison ou le générateur n'existe pas");
-		            continue;
-		        }
+            switch (choix) {
 
-		        
-		        r.ajouterConnexion(new Connexion(m, g));
-		        System.out.println("Connexion ajoutée : " + g.getNom() + " → " + m.getNom());
-		        break; 
+                case 1:
+                    String nouvM;
+                    do {
+                        System.out.println(" Entrez une maison (ex: maison1 moyenne) :");
+                        nouvM = scs.nextLine();
 
-		    } while (true);
-		    break;
+                        if (controller.ajouterMaison(nouvM)) {
+                            System.out.println("Maison ajoutée !");
+                            break; 
+                        } else {
+                            System.out.println(" Mauvais format ou type inconnu. Réessayez !");
+                        }
 
-		case 0:
-			break;
-		default:
-			break;
+                    } while (true);
+                    break;
 
-		}
-		
-	}while(chois != 0);
-	r.affihcerRx();
-	sc.close();
-}
+                case 2:
+                    String nouvG;
+                    do {
+                        System.out.println(" Entrez un générateur (ex: gen1 100) :");
+                        nouvG = scs.nextLine();
+
+                        if (controller.ajouterGenerateur(nouvG)) {
+                            System.out.println(" Générateur ajouté !");
+                            break;
+                        } else {
+                            System.out.println(" Format invalide. Réessayez !");
+                        }
+
+                    } while (true);
+                    break;
+
+                case 3:
+                    String nouvC;
+                    do {
+                        System.out.println(" Entrez une connexion (ex: gen1 maison1) :");
+                        nouvC = scs.nextLine();
+
+                        if (controller.ajouterConnexion(nouvC)) {
+                            System.out.println(" Connexion ajoutée !");
+                            break;
+                        } else {
+                            System.out.println(" Format invalide ou noms inexistants. Réessayez !");
+                        }
+
+                    } while (true);
+                    break;
+
+                case 0:
+                    System.out.println(" Fin du programme");
+                    break;
+
+                default:
+                    System.out.println(" Choix invalide, veuillez réessayer !");
+                    break;
+            }
+
+        } while (choix != 0);
+
+        reseau.affihcerRx();
+        sc.close();
+        scs.close();
+    }
 }

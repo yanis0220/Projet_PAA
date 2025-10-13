@@ -1,7 +1,18 @@
 package up.mi.paa.reseau_electrique.controller;
 
-public class Controller {
+import up.mi.paa.reseau_electrique.model.Connexion;
+import up.mi.paa.reseau_electrique.model.Generateur;
+import up.mi.paa.reseau_electrique.model.Maison;
+import up.mi.paa.reseau_electrique.model.Reseau;
+import up.mi.paa.reseau_electrique.model.TypeMaison;
 
+public class Controller {
+private Reseau reseau;
+
+	public Controller(Reseau reseau) {
+
+	this.reseau = reseau;
+}
 	public static boolean typeMaisonValide(String type) {
 		if(type.equalsIgnoreCase("BASSE") ||type.equalsIgnoreCase("MOYENNE") ||type.equalsIgnoreCase("FORTE"))
 			return true;
@@ -62,7 +73,35 @@ public class Controller {
 		    else
 		    	return true;
 
-
-		
 	}
+    public boolean ajouterMaison(String saisie) {
+        if (!formatAjoutMaison(saisie)) return false;
+
+        String[] parts = saisie.trim().split("\\s+");
+        Maison maison = new Maison(parts[0], TypeMaison.stringToTypeMaison(parts[1]));
+        reseau.ajouterMaison(maison);
+        return true;
+    }
+
+    public boolean ajouterGenerateur(String saisie) {
+        if (!formatAjoutGenerateur(saisie)) return false;
+
+        String[] parts = saisie.trim().split("\\s+");
+        Generateur gen = new Generateur(parts[0], Integer.parseInt(parts[1]));
+        reseau.ajouterGenerateur(gen);
+        return true;
+    }
+
+    public boolean ajouterConnexion(String saisie) {
+        if (!formatAjoutConnexion(saisie)) return false;
+
+        String[] parts = saisie.trim().split("\\s+");
+        Generateur g = reseau.recupererGenerateur(parts[0]);
+        Maison m = reseau.recupererMaison(parts[1]);
+
+        if (g == null || m == null) return false;
+
+        reseau.ajouterConnexion(new Connexion(m, g));
+        return true;
+    }
 }
