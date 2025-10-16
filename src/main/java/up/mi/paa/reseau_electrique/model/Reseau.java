@@ -3,7 +3,7 @@ import java.util.*;
 
 import up.mi.paa.reseau_electrique.controller.Controller;
 public class Reseau {
-	 private List<Maison> maisons = new ArrayList<>();
+	    private List<Maison> maisons = new ArrayList<>();
 	    private List<Generateur> generateurs = new ArrayList<>();
 	    private List<Connexion> connexions = new ArrayList<>();
 	    public Reseau() {
@@ -23,24 +23,15 @@ public class Reseau {
 	}
 	
 	
-	public int nbrGenerateurMaison(Maison m) {
-		int nbrG = 0;
-		for(Connexion c : connexions) {
-			if(c.getMaison().equals(m))
-				nbrG++;
-		}
-	
-		return nbrG;
+	public List<Connexion> getConnexions() {
+		return connexions;
 	}
-	
-	public int nbrMaisonParGenerateur(Generateur G) {
-		int nbrM = 0;
-		for(Connexion c : connexions) {
-			if(c.getGenerateur().equals(G))
-				nbrM++;
-		}
-		return nbrM++;
-		}
+
+	public void setConnexions(List<Connexion> connexions) {
+		this.connexions = connexions;
+	}
+
+
 	public boolean gererateurExistant(String g) {
 		for(Generateur i : generateurs) {
 			if(i.getNom().equals(g))

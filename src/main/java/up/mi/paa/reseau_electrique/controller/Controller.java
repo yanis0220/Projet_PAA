@@ -1,5 +1,8 @@
 package up.mi.paa.reseau_electrique.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import up.mi.paa.reseau_electrique.model.Connexion;
 import up.mi.paa.reseau_electrique.model.Generateur;
 import up.mi.paa.reseau_electrique.model.Maison;
@@ -92,8 +95,9 @@ private Reseau reseau;
         return true;
     }
 
-    public boolean ajouterConnexion(String saisie) {
+    public boolean ajouterConnexion(String saisie,List<Connexion> connexions) {
         if (!formatAjoutConnexion(saisie)) return false;
+        
 
         String[] parts = saisie.trim().split("\\s+");
         Generateur g = reseau.recupererGenerateur(parts[0]);
@@ -101,7 +105,31 @@ private Reseau reseau;
 
         if (g == null || m == null) return false;
 
-        reseau.ajouterConnexion(new Connexion(m, g));
+        connexions.add(new Connexion(m,g));
         return true;
+    }
+    public boolean ajouterListeConnexion(List<Connexion> connexions) {
+    	int i;
+    	for(Connexion c : connexions) {
+    		i = 0;
+    		for(Connexion c1 : connexions) {
+    			if(c.getMaison().equals(c1.getMaison()))
+    				 i++;
+    		}
+    		if(i >= 2) {
+    			System.out.println("la maison " + c.getMaison().getNom()+ " a trop de generateurs");
+    			return false;
+    		}
+    			
+    	}
+    	return true;
+    }
+    public boolean ajouterConnexionsRx(List<Connexion> connexions) {
+    	if(!ajouterListeConnexion(connexions))
+    		return false;
+    	
+    	this.reseau.setConnexions(connexions);
+    	return true;
+    	
     }
 }

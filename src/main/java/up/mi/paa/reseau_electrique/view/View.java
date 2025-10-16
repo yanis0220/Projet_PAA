@@ -1,7 +1,10 @@
 package up.mi.paa.reseau_electrique.view;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import up.mi.paa.reseau_electrique.controller.Controller;
+import up.mi.paa.reseau_electrique.model.Connexion;
 import up.mi.paa.reseau_electrique.model.Reseau;
 
 public class View {
@@ -12,7 +15,7 @@ public class View {
 
         Reseau reseau = new Reseau();
         Controller controller = new Controller(reseau);
-
+         List<Connexion> connexions = new ArrayList<>();
         int choix;
 
         do {
@@ -20,6 +23,8 @@ public class View {
             System.out.println("1 - Ajouter une maison (format: nom type)");
             System.out.println("2 - Ajouter un générateur (format: nom capacité)");
             System.out.println("3 - Ajouter une connexion (format: nomGenerateur nomMaison)");
+            System.out.println("fin");
+            
             System.out.println("0 - Quitter");
             System.out.print("Votre choix : ");
             choix = sc.nextInt();
@@ -65,7 +70,7 @@ public class View {
                         System.out.println(" Entrez une connexion (ex: gen1 maison1) :");
                         nouvC = scs.nextLine();
 
-                        if (controller.ajouterConnexion(nouvC)) {
+                        if (controller.ajouterConnexion(nouvC,connexions)) {
                             System.out.println(" Connexion ajoutée !");
                             break;
                         } else {
@@ -74,7 +79,12 @@ public class View {
 
                     } while (true);
                     break;
-
+                case 4:
+                	
+                	if(controller.ajouterConnexionsRx(connexions))
+                		System.out.println("reseau crée avec succes");
+                       
+                	break;
                 case 0:
                     System.out.println(" Fin du programme");
                     break;
