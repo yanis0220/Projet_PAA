@@ -1,5 +1,7 @@
 package up.mi.paa.reseau_electrique.model;
 
+import java.util.Objects;
+
 public class Connexion {
 private Maison maison;
 private Generateur generateur;
@@ -22,5 +24,19 @@ public Generateur getGenerateur() {
 public void setGenerateur(Generateur generateur) {
 	this.generateur = generateur;
 }
+
+@Override
+public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Connexion c = (Connexion) o;
+    return maison.equals(c.maison) && generateur.equals(c.generateur);
+}
+
+@Override
+public int hashCode() {
+    return Objects.hash(maison, generateur);
+}
+
 
 }

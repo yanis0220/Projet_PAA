@@ -1,9 +1,9 @@
 package up.mi.paa.reseau_electrique.model;
 import java.util.*;
 
-import up.mi.paa.reseau_electrique.controller.Controller;
+
 public class Reseau {
-	 private List<Maison> maisons = new ArrayList<>();
+	    private List<Maison> maisons = new ArrayList<>();
 	    private List<Generateur> generateurs = new ArrayList<>();
 	    private List<Connexion> connexions = new ArrayList<>();
 	    public Reseau() {
@@ -23,25 +23,16 @@ public class Reseau {
 	}
 	
 	
-	public int nbrGenerateurMaison(Maison m) {
-		int nbrG = 0;
-		for(Connexion c : connexions) {
-			if(c.getMaison().equals(m))
-				nbrG++;
-		}
-	
-		return nbrG;
+	public List<Connexion> getConnexions() {
+		return connexions;
 	}
-	
-	public int nbrMaisonParGenerateur(Generateur G) {
-		int nbrM = 0;
-		for(Connexion c : connexions) {
-			if(c.getGenerateur().equals(G))
-				nbrM++;
-		}
-		return nbrM++;
-		}
-	public boolean gererateurExistant(String g) {
+
+	public void setConnexions(List<Connexion> connexions) {
+		this.connexions = connexions;
+	}
+
+
+	public boolean generateurExistant(String g) {
 		for(Generateur i : generateurs) {
 			if(i.getNom().equals(g))
 				return true;
@@ -56,23 +47,27 @@ public class Reseau {
 		return false;
 	}
 	public boolean connexionExistante(String c) {
-	
-			 String[] parties = c.trim().split("\\s+");
-			 String g = parties[0];
-			 String m = parties[1];
-			 
-			 if(!gererateurExistant(g))
-				 return false;
-			 if(!maisonExistante(m))
-				 return false;
-			 
-			 for(Connexion i : connexions) {
-				 if(i.getGenerateur().equals(g) && i.getMaison().equals(m))
-					 return true;
-			 }
-			 return false;
+	    String[] parties = c.trim().split("\\s+");
+	    if (parties.length != 2) return false;
 
+	    String p1 = parties[0];
+	    String p2 = parties[1];
+
+	    
+	    if (!generateurExistant(p1) && !generateurExistant(p2)) return false;
+	    if (!maisonExistante(p1) && !maisonExistante(p2)) return false;
+
+	    for (Connexion i : connexions) {
+	        String nomG = i.getGenerateur().getNom();
+	        String nomM = i.getMaison().getNom();
+	        if ((nomG.equalsIgnoreCase(p1) && nomM.equalsIgnoreCase(p2)) ||
+	            (nomG.equalsIgnoreCase(p2) && nomM.equalsIgnoreCase(p1))) {
+	            return true;
+	        }
+	    }
+	    return false;
 	}
+
 	
 	public Maison recupererMaison(String nom) {
 		for (Maison m : maisons) {
@@ -94,12 +89,12 @@ public class Reseau {
 	public void affihcerRx() {
 		System.out.println("les maisons sont : ");
 		for(Maison m : maisons) {
-			System.out.println(m.getNom());
+			System.out.println(m.getNom() +" "+ m.getConsommation());
 		}
 		
 		System.out.println("les generateurs sont : ");
 		for(Generateur g : generateurs) {
-			System.out.println(g.getNom());
+			System.out.println(g.getNom() +" "+ g.getCapacite());
 		}
 		
 		System.out.println("les connexion sont : ");
