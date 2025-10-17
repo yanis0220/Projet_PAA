@@ -33,4 +33,16 @@ public void setType(TypeMaison type) {
 public double getConsommation() {
     return type.getConsommationKW();
 }
+@Override
+public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Maison maison = (Maison) o;
+    return nom.equalsIgnoreCase(maison.nom);
+}
+
+@Override
+public int hashCode() {
+    return nom.toLowerCase().hashCode();
+}
 }

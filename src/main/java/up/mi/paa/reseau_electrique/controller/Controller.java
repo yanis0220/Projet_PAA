@@ -82,7 +82,12 @@ private Reseau reseau;
 
         String[] parts = saisie.trim().split("\\s+");
         Maison maison = new Maison(parts[0], TypeMaison.stringToTypeMaison(parts[1]));
-        reseau.ajouterMaison(maison);
+        if(reseau.maisonExistante(parts[0])) {
+        	reseau.recupererMaison(parts[0]).setType(TypeMaison.stringToTypeMaison(parts[1]));
+        }else {
+        	reseau.ajouterMaison(maison);
+        }
+        
         return true;
     }
 
@@ -91,41 +96,57 @@ private Reseau reseau;
 
         String[] parts = saisie.trim().split("\\s+");
         Generateur gen = new Generateur(parts[0], Integer.parseInt(parts[1]));
-        reseau.ajouterGenerateur(gen);
+        if(reseau.generateurExistant(parts[0])) {
+        	reseau.recupererGenerateur(parts[0]).setCapacite(Integer.parseInt(parts[1]));;
+        }else {
+        	reseau.ajouterGenerateur(gen);
+        }
+        
         return true;
     }
 
-    public boolean ajouterConnexion(String saisie,List<Connexion> connexions) {
+    public boolean ajouterConnexion(String saisie, List<Connexion> connexions) {
         if (!formatAjoutConnexion(saisie)) return false;
-        
 
         String[] parts = saisie.trim().split("\\s+");
+        if (parts.length != 2) return false;
+        
         Generateur g = reseau.recupererGenerateur(parts[0]);
         Maison m = reseau.recupererMaison(parts[1]);
+        
+       
+        if (g == null || m == null) {
+            g = reseau.recupererGenerateur(parts[1]);
+            m = reseau.recupererMaison(parts[0]);
+        }
 
+       
         if (g == null || m == null) return false;
+        if(connexions.contains(new Connexion(m, g)))
+        	return false;
 
-        connexions.add(new Connexion(m,g));
+        connexions.add(new Connexion(m, g));
         return true;
     }
-    public boolean ajouterListeConnexion(List<Connexion> connexions) {
-    	int i;
-    	for(Connexion c : connexions) {
-    		i = 0;
-    		for(Connexion c1 : connexions) {
-    			if(c.getMaison().equals(c1.getMaison()))
-    				 i++;
-    		}
-    		if(i >= 2) {
-    			System.out.println("la maison " + c.getMaison().getNom()+ " a trop de generateurs");
-    			return false;
-    		}
-    			
-    	}
-    	return true;
+
+    public List<Maison> verifierConnexions(List<Connexion> connexions) {
+        List<Maison> doublons = new ArrayList<>();
+
+        for (Connexion c : connexions) {
+            int count = 0;
+            for (Connexion c1 : connexions) {
+                if (c.getMaison().equals(c1.getMaison())) count++;
+            }
+            if (count > 1 && !doublons.contains(c.getMaison())) {
+                doublons.add(c.getMaison());
+            }
+        }
+        return doublons; 
     }
+
+
     public boolean ajouterConnexionsRx(List<Connexion> connexions) {
-    	if(!ajouterListeConnexion(connexions))
+    	if(!verifierConnexions(connexions).isEmpty())
     		return false;
     	
     	this.reseau.setConnexions(connexions);

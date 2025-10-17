@@ -20,6 +20,17 @@ public void setNom(String nom) {
 	this.nom = nom;
 }
 
+@Override
+public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Generateur g = (Generateur) o;
+    return nom.equalsIgnoreCase(g.nom); 
+}
 
+@Override
+public int hashCode() {
+    return nom.toLowerCase().hashCode();
+}
 
 }

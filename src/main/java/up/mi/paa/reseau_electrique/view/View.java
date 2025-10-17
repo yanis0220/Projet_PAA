@@ -1,10 +1,13 @@
 package up.mi.paa.reseau_electrique.view;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 import up.mi.paa.reseau_electrique.controller.Controller;
 import up.mi.paa.reseau_electrique.model.Connexion;
+import up.mi.paa.reseau_electrique.model.Generateur;
+import up.mi.paa.reseau_electrique.model.Maison;
 import up.mi.paa.reseau_electrique.model.Reseau;
 
 public class View {
@@ -27,8 +30,13 @@ public class View {
             
             System.out.println("0 - Quitter");
             System.out.print("Votre choix : ");
-            choix = sc.nextInt();
-            sc.nextLine(); 
+            String saisies = sc.nextLine(); 
+            try {
+                choix = Integer.parseInt(saisies.trim());
+            } catch (NumberFormatException e) {
+                choix = -1; 
+                System.out.println("Saisie invalide, veuillez entrer un nombre.");
+            }
 
             switch (choix) {
 
@@ -66,8 +74,11 @@ public class View {
 
                 case 3:
                     String nouvC;
+                    int x = 1;
                     do {
+                    	
                         System.out.println(" Entrez une connexion (ex: gen1 maison1) :");
+                        
                         nouvC = scs.nextLine();
 
                         if (controller.ajouterConnexion(nouvC,connexions)) {
@@ -75,22 +86,69 @@ public class View {
                             break;
                         } else {
                             System.out.println(" Format invalide ou noms inexistants. Réessayez !");
+                            
                         }
-
-                    } while (true);
+                        System.out.println(" taper 1 pour ajouter d'autres connexions ou 0 pour quitter");
+                        String saisie = sc.nextLine(); 
+                        try {
+                            x= Integer.parseInt(saisie.trim()); 
+                        } catch (NumberFormatException e) {
+                            x = 0; 
+                            System.out.println("Saisie invalide, retour au menu principal.");
+                        }
+                    } while (true && x == 1);
                     break;
                 case 4:
-                	
-                	if(controller.ajouterConnexionsRx(connexions))
-                		System.out.println("reseau crée avec succes");
-                       
-                	break;
-                case 0:
-                    System.out.println(" Fin du programme");
-                    break;
+                    List<Maison> doublons = controller.verifierConnexions(connexions);
 
-                default:
-                    System.out.println(" Choix invalide, veuillez réessayer !");
+                    while (!doublons.isEmpty()) {
+                        for (Maison maison : doublons) {
+                            System.out.println("La maison " + maison.getNom() + " a trop de générateurs !");
+                            
+                            List<Connexion> connexionsMaison = new ArrayList<>();
+                            System.out.println("Connexions actuelles :");
+                            for (Connexion c : connexions) {
+                                if (c.getMaison().equals(maison)) {
+                                    System.out.println("- Générateur : " + c.getGenerateur().getNom());
+                                    connexionsMaison.add(c);
+                                }
+                            }
+
+                            Generateur garder = null;
+                            while (garder == null) {
+                                System.out.print("Entrez le nom du générateur à garder : ");
+                                String choixGenerateur = sc.nextLine().trim();
+
+                                for (Connexion c : connexionsMaison) {
+                                    if (c.getGenerateur().getNom().equalsIgnoreCase(choixGenerateur)) {
+                                        garder = c.getGenerateur();
+                                        break;
+                                    }
+                                }
+
+                                if (garder == null) {
+                                    System.out.println("Nom invalide, veuillez réessayer !");
+                                }
+                            }
+
+                           
+                            Iterator<Connexion> it = connexions.iterator();
+                            while (it.hasNext()) {
+                                Connexion c = it.next();
+                                if (c.getMaison().equals(maison) && !c.getGenerateur().equals(garder)) {
+                                    it.remove();
+                                }
+                            }
+                        }
+
+                       
+                        doublons = controller.verifierConnexions(connexions);
+                    }
+
+                    
+                    controller.ajouterConnexionsRx(connexions);
+                    System.out.println("Réseau créé avec succès !");
+                    choix = 1; // pour revenir au menu principal
                     break;
             }
 
