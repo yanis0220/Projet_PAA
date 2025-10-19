@@ -19,6 +19,7 @@ public class Reseau {
 		generateurs.add(g);
 	}
 	public void ajouterConnexion(Connexion c) {
+		connexions.removeIf(old -> old.getMaison().equals(c.getMaison()));
 		connexions.add(c);
 	}
 	
@@ -102,4 +103,60 @@ public class Reseau {
 			System.out.println(c.getMaison().getNom()+" -> "+c.getGenerateur().getNom());
 		}
 	}
+	
+	public double chargeGenerateur(Generateur g) {
+	    double total = 0.0;
+	    for (Connexion c : connexions) {
+	        if (c.getGenerateur().equals(g)) {
+	            total += c.getMaison().getConsommation(); // 10 / 20 / 40 selon votre enum actuelle
+	        }
+	    }
+	    return total;
+	}
+	
+	public double tauxUtilisation(Generateur g) {
+	    int Cg = g.getCapacite();
+	    if (Cg <= 0) return 0.0;
+	    double Lg = chargeGenerateur(g);
+	    return Lg / Cg;
+	}
+	
+	public double moyenneTauxUtilisation() {
+		if(generateurs.isEmpty()) {
+			return 0.0;
+		}
+		double somme= 0.0;
+		for (Generateur g : generateurs) {
+	        somme += tauxUtilisation(g);
+	    }
+		 return somme / generateurs.size();
+		
+	}
+	
+	public double dispersion() {
+	    double ubar = moyenneTauxUtilisation();
+	    double disp = 0.0;
+	    for (Generateur g : generateurs) {
+	        disp += Math.abs(tauxUtilisation(g) - ubar);
+	    }
+	    return disp;
+	}
+	
+	public double surcharge() {
+	    double s = 0.0;
+	    for (Generateur g : generateurs) {
+	        double Lg = chargeGenerateur(g);
+	        double Cg = g.getCapacite();
+	        if (Cg > 0) {
+	            s += Math.max(0.0, (Lg - Cg) / Cg);
+	        }
+	    }
+	    return s;
+	}
+	
+	public double coutTotal() {
+	    final int LAMBDA = 10;
+	    return dispersion() + LAMBDA * surcharge();
+	}
+	
 }
